@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>தாஸ் சேவை மையம் - ஒப்புகை & கட்டண இரசீது டூல்</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Mukta Malar', 'Latha', sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* டேப் (Tabs) ஸ்டைல் */
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            background-color: #cbd5e1;
+            color: #1e293b;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: #1e3a8a;
+            color: #ffffff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ஃபார்ம் & லாக் கார்டு */
+        .input-form, .history-section {
+            background: #ffffff;
+            padding: 20px 25px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .input-form h2, .history-section h2 {
+            margin-top: 0;
+            color: #1e3a8a;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .btn-submit {
+            background-color: #0d9488;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            background-color: #0f766e;
+        }
+
+        /* இரசீது டிசைன் */
+        .receipt-card {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 25px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px dashed #000;
+            padding-bottom: 10px;
+        }
+
+        .center-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            color: #000;
+        }
+
+        .center-subtitle {
+            font-size: 13px;
+            margin-top: 3px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .receipt-type-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 10px 0 0 0;
+            text-decoration: underline;
+        }
+
+        .center-info {
+            border: 1px dashed #000;
+            padding: 8px 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            text-align: center;
+            background-color: #fcfcfc;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .details-table th, .details-table td {
+            border: 1px solid #000;
+            padding: 8px 12px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .details-table th {
+            background-color: #f8fafc;
+            width: 35%;
+            font-weight: bold;
+        }
+
+        .ref-no-bold {
+            font-size: 20px !important;
+            font-weight: 800 !important;
+            letter-spacing: 1px;
+        }
+
+        .amount-bold {
+            font-size: 20px !important;
+            font-weight: 800 !important;
+            color: #b91c1c;
+        }
+
+        /* Dynamic Payment QR Section */
+        .payment-qr-container {
+            display: table;
+            width: 100%;
+            border: 1px solid #000;
+            margin-bottom: 15px;
+            background-color: #f8fafc;
+        }
+
+        .payment-qr-cell {
+            display: table-cell;
+            vertical-align: middle;
+            padding: 10px;
+        }
+
+        .qr-box {
+            text-align: center;
+            width: 130px;
+            border-right: 1px solid #000;
+        }
+
+        .qr-box img {
+            width: 110px;
+            height: 110px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .pay-info {
+            padding-left: 15px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .declaration {
+            font-size: 12px;
+            font-weight: 600;
+            margin: 15px 0;
+            text-align: justify;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding: 0 10px;
+        }
+
+        .signature-box {
+            text-align: center;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .btn-print {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* வரலாற்று அட்டவணை */
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .log-table th, .log-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        .log-table th {
+            background-color: #f1f5f9;
+        }
+
+        .btn-tbl-action {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-right: 3px;
+            font-weight: bold;
+        }
+
+        .btn-tbl-edit { background-color: #f59e0b; color: white; }
+        .btn-tbl-print { background-color: #3b82f6; color: white; }
+
+        .filter-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Print Settings */
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+                margin: 0;
+            }
+            .tab-buttons, .input-form, .history-section, .action-buttons {
+                display: none !important;
+            }
+            .container {
+                max-width: 100%;
+            }
+            .receipt-card {
+                border: 2px solid #000;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- டேப் பட்டன்கள் -->
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('ack')">1. ஒப்புகைச்சீட்டு (Acknowledgement)</button>
+        <button class="tab-btn" onclick="switchTab('pay')">2. கட்டண இரசீது (Payment Invoice)</button>
+    </div>
+
+    <!-- TAB 1: ஒப்புகைச்சீட்டு பகுதி -->
+    <div id="tab-ack" class="tab-content active">
+        <div class="input-form">
+            <h2 id="ackFormTitle">ஆவண ஒப்புகைச்சீட்டு உருவாக்குதல்</h2>
+            <input type="hidden" id="ackEditIndex" value="-1">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>விண்ணப்பதாரர் பெயர்</label>
+                    <input type="text" id="ackName" placeholder="பெயரை உள்ளிடவும்">
+                </div>
+                <div class="form-group">
+                    <label>கைபேசி எண்</label>
+                    <input type="text" id="ackMobile" placeholder="கைபேசி எண்">
+                </div>
+                <div class="form-group">
+                    <label>சேவை வகை</label>
+                    <select id="ackServiceType">
+                        <option value="இ சேவை">இ சேவை</option>
+                        <option value="பொது சேவை">பொது சேவை</option>
+                        <option value="ஸ்மார்ட் கார்டு">ஸ்மார்ட் கார்டு</option>
+                        <option value="ஆதார் சேவை">ஆதார் சேவை</option>
+                        <option value="பான் கார்டு">பான் கார்டு</option>
+                        <option value="வாக்காளர் அட்டை">வாக்காளர் அட்டை</option>
+                        <option value="பிறப்பு / இறப்பு">பிறப்பு / இறப்பு</option>
+                        <option value="பட்டாசிட்டா">பட்டாசிட்டா</option>
+                        <option value="இதர">இதர</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>சேவை பெயர்</label>
+                    <input type="text" id="ackServiceName" placeholder="எ.கா: ஜாதி சான்றிதழ்">
+                </div>
+                <div class="form-group">
+                    <label>விண்ணப்ப எண் / குறிப்பு எண்</label>
+                    <input type="text" id="ackRefNo" placeholder="எ.கா: TN-5202608011162">
+                </div>
+                <div class="form-group">
+                    <label>நாள் & நேரம்</label>
+                    <input type="datetime-local" id="ackDateTime">
+                </div>
+            </div>
+            <button class="btn-submit" onclick="saveAckReceipt()">ஒப்புகைச்சீட்டு உருவாக்கி சேமி</button>
+        </div>
+
+        <!-- அச்சிடப்படும் ஒப்புகைச்சீட்டு -->
+        <div class="receipt-card">
+            <div class="receipt-header">
+                <h1 class="center-title">DHASS PUBLIC SERVICE CENTER</h1>
+                <div class="center-subtitle">
+                    147எ, கிரேட் காட்டன் ரோடு, மத்திய பாகம் காவல் நிலையம் அருகில், தூத்துக்குடி - 628001<br>
+                    செல்: 98432 32324 / 88702 32332
+                </div>
+                <h2 class="receipt-type-title">ஆவண ஒப்புகைச்சீட்டு</h2>
+            </div>
+
+            <div class="center-info">
+                கீழ்கண்ட சேவை பெற விண்ணப்பம் சமர்ப்பிக்கப்பட்டு, வெற்றிகரமாக பதிவு செய்யப்பட்டுள்ளது என்பதற்கான ஒப்புகை வழங்கப்படுகிறது.
+            </div>
+
+            <table class="details-table">
+                <tr>
+                    <th>விண்ணப்பதாரர் பெயர்</th>
+                    <td id="outAckName">-</td>
+                </tr>
+                <tr>
+                    <th>கைபேசி எண்</th>
+                    <td id="outAckMobile">-</td>
+                </tr>
+                <tr>
+                    <th>சேவை வகை & பெயர்</th>
+                    <td id="outAckService">-</td>
+                </tr>
+                <tr>
+                    <th>விண்ணப்ப எண் / குறிப்பு எண்</th>
+                    <td id="outAckRefNo" class="ref-no-bold">-</td>
+                </tr>
+                <tr>
+                    <th>நாள் & நேரம்</th>
+                    <td id="outAckDateTime">-</td>
+                </tr>
+            </table>
+
+            <div class="declaration">
+                இச்சேவையை பெறுவதற்காக அளிக்கப்பட்ட விவரங்கள் அனைத்தும் உண்மை என நான் உறுதி அளிக்கிறேன்.
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-box"><br><br>மைய பொறுப்பாளரின் கையொப்பம்</div>
+                <div class="signature-box"><br><br>விண்ணப்பதாரரின் கையொப்பம்</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-print" onclick="window.print()">ஒப்புகைச்சீட்டு பிரிண்ட் செய்ய</button>
+        </div>
+
+        <!-- ஒப்புகை வரலாற்று பதிவு -->
+        <div class="history-section" style="margin-top:20px;">
+            <h2>ஒப்புகைச்சீட்டு பதிவுகள் (Daily History)</h2>
+            <div class="filter-box">
+                <label><b>தேதி தேர்வு செய்க:</b></label>
+                <input type="date" id="filterAckDate" onchange="renderAckLogs()">
+                <button onclick="document.getElementById('filterAckDate').value=''; renderAckLogs();">அனைத்தும்</button>
+            </div>
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>நாள் & நேரம்</th>
+                        <th>பெயர்</th>
+                        <th>செல் எண்</th>
+                        <th>சேவை</th>
+                        <th>விண்ணப்ப எண்</th>
+                        <th>செயல்பாடு</th>
+                    </tr>
+                </thead>
+                <tbody id="ackLogBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- TAB 2: கட்டண இரசீது பகுதி -->
+    <div id="tab-pay" class="tab-content">
+        <div class="input-form">
+            <h2 id="payFormTitle">கட்டண இரசீது (Payment Invoice) உருவாக்குதல்</h2>
+            <input type="hidden" id="payEditIndex" value="-1">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>வாடிக்கையாளர் பெயர்</label>
+                    <input type="text" id="payName" placeholder="பெயரை உள்ளிடவும்">
+                </div>
+                <div class="form-group">
+                    <label>கைபேசி எண்</label>
+                    <input type="text" id="payMobile" placeholder="கைபேசி எண்">
+                </div>
+                <div class="form-group">
+                    <label>சேவை வகை</label>
+                    <select id="payServiceType">
+                        <option value="இ சேவை">இ சேவை</option>
+                        <option value="பொது சேவை">பொது சேவை</option>
+                        <option value="ஸ்மார்ட் கார்டு">ஸ்மார்ட் கார்டு</option>
+                        <option value="ஆதார் சேவை">ஆதார் சேவை</option>
+                        <option value="பான் கார்டு">பான் கார்டு</option>
+                        <option value="வாக்காளர் அட்டை">வாக்காளர் அட்டை</option>
+                        <option value="பிறப்பு / இறப்பு">பிறப்பு / இறப்பு</option>
+                        <option value="பட்டாசிட்டா">பட்டாசிட்டா</option>
+                        <option value="இதர">இதர</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>சேவை பெயர்</label>
+                    <input type="text" id="payServiceName" placeholder="எ.கா: பட்டா சிட்டா மாறுதல்">
+                </div>
+                <div class="form-group">
+                    <label>கட்டணத் தொகை (₹)</label>
+                    <input type="number" id="payAmount" placeholder="எ.கா: 200">
+                </div>
+                <div class="form-group">
+                    <label>நாள் & நேரம்</label>
+                    <input type="datetime-local" id="payDateTime">
+                </div>
+            </div>
+            <button class="btn-submit" onclick="savePayReceipt()">கட்டண இரசீது உருவாக்கி சேமி</button>
+        </div>
+
+        <!-- அச்சிடப்படும் கட்டண இரசீது -->
+        <div class="receipt-card">
+            <div class="receipt-header">
+                <h1 class="center-title">DHASS PUBLIC SERVICE CENTER</h1>
+                <div class="center-subtitle">
+                    147எ, கிரேட் காட்டன் ரோடு, மத்திய பாகம் காவல் நிலையம் அருகில், தூத்துக்குடி - 628001<br>
+                    செல்: 98432 32324 / 88702 32332
+                </div>
+                <h2 class="receipt-type-title">கட்டணக் கோரிக்கை இரசீது</h2>
+            </div>
+
+            <div class="center-info">
+                கீழ்கண்ட சேவைக்கான ஆவணங்கள் ஏற்றுக்கொள்ளப்பட்டது. சேவைக் கட்டணத்தைச் செலுத்துமாறு கேட்டுக்கொள்ளப்படுகிறீர்கள்.
+            </div>
+
+            <table class="details-table">
+                <tr>
+                    <th>வாடிக்கையாளர் பெயர்</th>
+                    <td id="outPayName">-</td>
+                </tr>
+                <tr>
+                    <th>கைபேசி எண்</th>
+                    <td id="outPayMobile">-</td>
+                </tr>
+                <tr>
+                    <th>சேவை பெயர்</th>
+                    <td id="outPayService">-</td>
+                </tr>
+                <tr>
+                    <th>செலுத்த வேண்டிய கட்டணம்</th>
+                    <td id="outPayAmount" class="amount-bold">₹ 0.00</td>
+                </tr>
+                <tr>
+                    <th>நாள் & நேரம்</th>
+                    <td id="outPayDateTime">-</td>
+                </tr>
+            </table>
+
+            <div class="payment-qr-container">
+                <div class="payment-qr-cell qr-box">
+                    <img id="outQrCode" src="" alt="UPI QR Code">
+                </div>
+                <div class="payment-qr-cell pay-info">
+                    <b>ஆன்லைன் மூலம் பணம் செலுத்த:</b><br>
+                    இடதுபுறம் உள்ள QR கோடை <b>GPay, PhonePe, Paytm</b> மூலம் ஸ்கேன் செய்து கட்டணம் செலுத்தலாம்.<br>
+                    <b>UPI ID:</b> 9843232324@ybl
+                </div>
+            </div>
+
+            <div class="declaration">
+                குறிப்பு: கட்டணம் செலுத்திய பின் உங்கள் வேலை உடனுக்குடன் செயல்படுத்தப்படும்.
+            </div>
+
+            <div class="signature-section">
+                <div class="signature-box"><br><br>மைய பொறுப்பாளரின் கையொப்பம்</div>
+                <div class="signature-box"><br><br>வாடிக்கையாளரின் கையொப்பம்</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-print" onclick="window.print()">கட்டண இரசீது பிரிண்ட் செய்ய</button>
+        </div>
+
+        <!-- கட்டண வரலாற்று பதிவு -->
+        <div class="history-section" style="margin-top:20px;">
+            <h2>கட்டணப் பதிவுகள் (Daily History)</h2>
+            <div class="filter-box">
+                <label><b>தேதி தேர்வு செய்க:</b></label>
+                <input type="date" id="filterPayDate" onchange="renderPayLogs()">
+                <button onclick="document.getElementById('filterPayDate').value=''; renderPayLogs();">அனைத்தும்</button>
+            </div>
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>நாள் & நேரம்</th>
+                        <th>பெயர்</th>
+                        <th>செல் எண்</th>
+                        <th>சேவை</th>
+                        <th>கட்டணம் (₹)</th>
+                        <th>செயல்பாடு</th>
+                    </tr>
+                </thead>
+                <tbody id="payLogBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const UPI_ID = "9843232324@ybl";
+    const CENTER_NAME = "Dhass Public Service Center";
+
+    let ackLogs = JSON.parse(localStorage.getItem('dhass_ack_logs')) || [];
+    let payLogs = JSON.parse(localStorage.getItem('dhass_pay_logs')) || [];
+
+    window.onload = function() {
+        setDefaultDateTime();
+        renderAckLogs();
+        renderPayLogs();
+        updatePayQr(0);
+    };
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        if(tab === 'ack') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('tab-ack').classList.add('active');
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('tab-pay').classList.add('active');
+        }
+    }
+
+    function setDefaultDateTime() {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        const timeStr = now.toISOString().slice(0,16);
+        document.getElementById('ackDateTime').value = timeStr;
+        document.getElementById('payDateTime').value = timeStr;
+    }
+
+    /* ----------- 1. ஒப்புகைச்சீட்டு செயல்பாடுகள் ----------- */
+    function saveAckReceipt() {
+        const name = document.getElementById('ackName').value;
+        const mobile = document.getElementById('ackMobile').value;
+        const serviceType = document.getElementById('ackServiceType').value;
+        const serviceName = document.getElementById('ackServiceName').value;
+        const refNo = document.getElementById('ackRefNo').value;
+        const dateTimeVal = document.getElementById('ackDateTime').value;
+        const editIdx = parseInt(document.getElementById('ackEditIndex').value);
+
+        if(!name || !refNo) { alert('பெயர் மற்றும் விண்ணப்ப எண்ணை உள்ளிடவும்!'); return; }
+
+        const formattedDate = dateTimeVal ? new Date(dateTimeVal).toLocaleString('ta-IN') : '-';
+        const rawDate = dateTimeVal ? dateTimeVal.split('T')[0] : '';
+
+        const record = {
+            id: editIdx >= 0 ? ackLogs[editIdx].id : Date.now(),
+            dateOnly: rawDate,
+            dateTime: formattedDate,
+            name, mobile, serviceType, serviceName, refNo
+        };
+
+        if(editIdx >= 0) {
+            ackLogs[editIdx] = record;
+            document.getElementById('ackEditIndex').value = "-1";
+            document.getElementById('ackFormTitle').innerText = "ஆவண ஒப்புகைச்சீட்டு உருவாக்குதல்";
+        } else {
+            ackLogs.unshift(record);
+        }
+
+        localStorage.setItem('dhass_ack_logs', JSON.stringify(ackLogs));
+        displayAckCard(record);
+        renderAckLogs();
+        clearAckForm();
+    }
+
+    function displayAckCard(rec) {
+        document.getElementById('outAckName').innerText = rec.name;
+        document.getElementById('outAckMobile').innerText = rec.mobile || '-';
+        document.getElementById('outAckService').innerText = rec.serviceType + " - " + (rec.serviceName || '');
+        document.getElementById('outAckRefNo').innerText = rec.refNo;
+        document.getElementById('outAckDateTime').innerText = rec.dateTime;
+    }
+
+    function editAck(index) {
+        const item = ackLogs[index];
+        document.getElementById('ackName').value = item.name;
+        document.getElementById('ackMobile').value = item.mobile;
+        document.getElementById('ackServiceType').value = item.serviceType;
+        document.getElementById('ackServiceName').value = item.serviceName;
+        document.getElementById('ackRefNo').value = item.refNo;
+        document.getElementById('ackEditIndex').value = index;
+        document.getElementById('ackFormTitle').innerText = "ஒப்புகைச்சீட்டு விவரங்களை திருத்துதல்";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function printAck(index) {
+        displayAckCard(ackLogs[index]);
+        window.print();
+    }
+
+    function renderAckLogs() {
+        const tbody = document.getElementById('ackLogBody');
+        const filterDate = document.getElementById('filterAckDate').value;
+        tbody.innerHTML = '';
+
+        const filtered = filterDate ? ackLogs.filter(r => r.dateOnly === filterDate) : ackLogs;
+
+        if(filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">பதிவுகள் எதுவுமில்லை</td></tr>';
+            return;
+        }
+
+        filtered.forEach((item, idx) => {
+            const originalIndex = ackLogs.findIndex(x => x.id === item.id);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.dateTime}</td>
+                <td><b>${item.name}</b></td>
+                <td>${item.mobile}</td>
+                <td>${item.serviceType} - ${item.serviceName}</td>
+                <td><b>${item.refNo}</b></td>
+                <td>
+                    <button class="btn-tbl-action btn-tbl-edit" onclick="editAck(${originalIndex})">திருத்து</button>
+                    <button class="btn-tbl-action btn-tbl-print" onclick="printAck(${originalIndex})">பிரிண்ட்</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function clearAckForm() {
+        document.getElementById('ackName').value = '';
+        document.getElementById('ackMobile').value = '';
+        document.getElementById('ackServiceName').value = '';
+        document.getElementById('ackRefNo').value = '';
+        setDefaultDateTime();
+    }
+
+
+    /* ----------- 2. கட்டண இரசீது செயல்பாடுகள் ----------- */
+    function updatePayQr(amount) {
+        const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(CENTER_NAME)}&am=${amount}&cu=INR`;
+        document.getElementById('outQrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiUrl)}`;
+    }
+
+    function savePayReceipt() {
+        const name = document.getElementById('payName').value;
+        const mobile = document.getElementById('payMobile').value;
+        const serviceType = document.getElementById('payServiceType').value;
+        const serviceName = document.getElementById('payServiceName').value;
+        const amount = document.getElementById('payAmount').value || 0;
+        const dateTimeVal = document.getElementById('payDateTime').value;
+        const editIdx = parseInt(document.getElementById('payEditIndex').value);
+
+        if(!name || !amount) { alert('பெயர் மற்றும் கட்டணத் தொகையை உள்ளிடவும்!'); return; }
+
+        const formattedDate = dateTimeVal ? new Date(dateTimeVal).toLocaleString('ta-IN') : '-';
+        const rawDate = dateTimeVal ? dateTimeVal.split('T')[0] : '';
+
+        const record = {
+            id: editIdx >= 0 ? payLogs[editIdx].id : Date.now(),
+            dateOnly: rawDate,
+            dateTime: formattedDate,
+            name, mobile, serviceType, serviceName, amount
+        };
+
+        if(editIdx >= 0) {
+            payLogs[editIdx] = record;
+            document.getElementById('payEditIndex').value = "-1";
+            document.getElementById('payFormTitle').innerText = "கட்டண இரசீது (Payment Invoice) உருவாக்குதல்";
+        } else {
+            payLogs.unshift(record);
+        }
+
+        localStorage.setItem('dhass_pay_logs', JSON.stringify(payLogs));
+        displayPayCard(record);
+        renderPayLogs();
+        clearPayForm();
+    }
+
+    function displayPayCard(rec) {
+        document.getElementById('outPayName').innerText = rec.name;
+        document.getElementById('outPayMobile').innerText = rec.mobile || '-';
+        document.getElementById('outPayService').innerText = rec.serviceType + " - " + (rec.serviceName || '');
+        document.getElementById('outPayAmount').innerText = "₹ " + parseFloat(rec.amount).toFixed(2);
+        document.getElementById('outPayDateTime').innerText = rec.dateTime;
+        updatePayQr(rec.amount);
+    }
+
+    function editPay(index) {
+        const item = payLogs[index];
+        document.getElementById('payName').value = item.name;
+        document.getElementById('payMobile').value = item.mobile;
+        document.getElementById('payServiceType').value = item.serviceType;
+        document.getElementById('payServiceName').value = item.serviceName;
+        document.getElementById('payAmount').value = item.amount;
+        document.getElementById('payEditIndex').value = index;
+        document.getElementById('payFormTitle').innerText = "கட்டண இரசீது விவரங்களை திருத்துதல்";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function printPay(index) {
+        displayPayCard(payLogs[index]);
+        window.print();
+    }
+
+    function renderPayLogs() {
+        const tbody = document.getElementById('payLogBody');
+        const filterDate = document.getElementById('filterPayDate').value;
+        tbody.innerHTML = '';
+
+        const filtered = filterDate ? payLogs.filter(r => r.dateOnly === filterDate) : payLogs;
+
+        if(filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">பதிவுகள் எதுவுமில்லை</td></tr>';
+            return;
+        }
+
+        filtered.forEach((item, idx) => {
+            const originalIndex = payLogs.findIndex(x => x.id === item.id);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.dateTime}</td>
+                <td><b>${item.name}</b></td>
+                <td>${item.mobile}</td>
+                <td>${item.serviceType} - ${item.serviceName}</td>
+                <td><b style="color:#b91c1c;">₹ ${item.amount}</b></td>
+                <td>
+                    <button class="btn-tbl-action btn-tbl-edit" onclick="editPay(${originalIndex})">திருத்து</button>
+                    <button class="btn-tbl-action btn-tbl-print" onclick="printPay(${originalIndex})">பிரிண்ட்</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function clearPayForm() {
+        document.getElementById('payName').value = '';
+        document.getElementById('payMobile').value = '';
+        document.getElementById('payServiceName').value = '';
+        document.getElementById('payAmount').value = '';
+        setDefaultDateTime();
+    }
+</script>
+
+</body>
+</html>
